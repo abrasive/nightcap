@@ -1,3 +1,4 @@
+// handle a delightful Windows/X11 type name conflict
 #define Status XStatus
 #include <X11/Xlib.h>
 #undef Status
@@ -9,6 +10,7 @@
 
 #include <windows.h>
 #include <stdio.h>
+#include <wchar.h>
 #include <unistd.h>
 #include <stdint.h>
 #include <signal.h>
@@ -87,28 +89,28 @@ int main(int argc, char **argv) {
         return 0;
     }
 
-    char cmdline[MAX_PATH];
-
-    STARTUPINFOA si;
+    STARTUPINFO si;
     PROCESS_INFORMATION pi;
 
     ZeroMemory( &si, sizeof(si) );
     si.cb = sizeof(si);
     ZeroMemory( &pi, sizeof(pi) );
 
+    char cmdline[MAX_PATH];
+    wchar_t wcmdline[MAX_PATH];
     sprintf(cmdline, "\"%s\" /p %lu", argv[1], (uintptr_t)hwnd);
+    MultiByteToWideChar(CP_UTF8, 0, cmdline, -1, wcmdline, MAX_PATH);
 
-    if (!CreateProcessA( argv[1],
-        cmdline,        // Command line
-        NULL,           // Process handle not inheritable
-        NULL,           // Thread handle not inheritable
-        FALSE,          // Set handle inheritance to FALSE
-        0,              // No creation flags
-        NULL,           // Use parent's environment block
-        NULL,           // Use parent's starting directory 
-        &si,            // Pointer to STARTUPINFO structure
-        &pi )           // Pointer to PROCESS_INFORMATION structure
-       ) {
+    if (!CreateProcess(NULL,
+        wcmdline,
+        NULL,
+        NULL,
+        FALSE,
+        0,
+        NULL,
+        NULL,
+        &si,
+        &pi)) {
         printf( "CreateProcess failed (%d).\n", GetLastError() );
         return 1;
     }
