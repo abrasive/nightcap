@@ -1,4 +1,4 @@
-Nightcap lets you run old Windows screensavers under XScreensaver, using wine.
+Nightcap lets you run old Windows screensavers under XScreenSaver, using wine.
 
 This uses the preview mode of the screensaver - where it draws into that little monitor in Windows' display settings.
 Screensavers that behave differently in preview mode probably won't work very well.
@@ -30,17 +30,17 @@ Tested with various MS/Plus screensavers, including the all-important 3D Maze.
 
     ```
 
-    The first quoted string is the title displayed in the XScreensaver config tool; the second is the filename of the screensaver itself.
+    The first quoted string is the title displayed in the XScreenSaver config tool; the second is the filename of the screensaver itself.
 
-Unfortunately you can't access the screensaver configurations through the XScreensaver UI.
+Unfortunately you can't access the screensaver configurations through the XScreenSaver UI.
 Instead, run `wine screensavername.scr` to access each saver's config.
 
 
 # How
 
 Windows' screensaver preview mode works by supplying a HWND on the commandline; the screensaver is responsible for creating a child window and drawing its output there.
-Meanwhile, XScreensaver provides its own X11 window, giving us the window ID to draw into.
+Meanwhile, XScreenSaver provides its own X11 window, giving us the window ID to draw into.
 
-So all we have to do is we create a Win32 window, find the X11 window that Wine created for it, reparent the X11 window into XScreensaver's X11 window, and then ask the screensaver to create itself under the Win32 window.
+So all we have to do is we create a Win32 window, find the X11 window that Wine created for it, reparent the X11 window into XScreenSaver's X11 window, and then ask the screensaver to create itself under the Win32 window.
 
 Easy when you live in the cursēd half-light of `winelib`, one foot firmly on the UNIX plane, and the other dipped in the Gatesian river...
