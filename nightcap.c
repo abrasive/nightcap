@@ -35,11 +35,40 @@ BOOL CALLBACK EnumChildProc(HWND hwnd, LPARAM lParam) {
     found_child = TRUE;
 }
 
+Display *dpy = NULL;
+int parent_xwindow;
+
+void die(const char *format, ...) {
+    va_list ap;
+    va_start(ap, format);
+    char msg[512];
+    vsprintf(msg, format, ap);
+    if (!msg)
+        exit(1);
+
+    printf("ERROR: %s\n", msg);
+
+    XGCValues gc_values;
+    gc_values.foreground = XWhitePixel(dpy, 0);
+    GC gc = XCreateGC(dpy, parent_xwindow, GCForeground, &gc_values);
+    XTextItem xti = {
+        .chars = msg,
+        .nchars = strlen(msg),
+        };
+    XDrawText(dpy, parent_xwindow, gc, 100, 100, &xti, 1);
+    XFlush(dpy);
+
+    Sleep(3000);
+
+    exit(1);
+}
+
+
 int main(int argc, char **argv) {
     signal(SIGTERM, cleanup);
     signal(SIGINT, cleanup);
 
-    Display *d = XOpenDisplay(NULL);
+    dpy = XOpenDisplay(NULL);
     HINSTANCE hInstance = NULL;
 
     const char *parent_xwindow_str = getenv("XSCREENSAVER_WINDOW");
@@ -47,13 +76,13 @@ int main(int argc, char **argv) {
         printf("error: XSCREENSAVER_WINDOW is not set\n");
         return 1;
     }
-    int parent_xwindow = strtol(parent_xwindow_str, NULL, 0);
+    parent_xwindow = strtol(parent_xwindow_str, NULL, 0);
 
     Window root;
     int x, y;
     unsigned int width, height, border_width, depth;
 
-    XGetGeometry(d, parent_xwindow, &root, &x, &y, &width, &height, &border_width, &depth);
+    XGetGeometry(dpy, parent_xwindow, &root, &x, &y, &width, &height, &border_width, &depth);
 
     if (argc < 2) {
         printf("usage: %s screensaver.scr\n", argv[0]);
@@ -111,8 +140,7 @@ int main(int argc, char **argv) {
         NULL,
         &si,
         &pi)) {
-        printf( "CreateProcess failed (%d).\n", GetLastError() );
-        return 1;
+        die("CreateProcess failed (%d). Probably the .scr was not found?", GetLastError());
     }
 
     while (!found_child) {
@@ -127,8 +155,8 @@ int main(int argc, char **argv) {
 
     int our_xwindow = (uintptr_t)GetPropW(hwnd, whole_window_prop);
 
-    int result = XReparentWindow(d, our_xwindow, parent_xwindow, 0, 0);
-    XFlush(d);
+    int result = XReparentWindow(dpy, our_xwindow, parent_xwindow, 0, 0);
+    XFlush(dpy);
     ShowWindow(hwnd, SW_SHOW);
 
     MSG msg = { };
