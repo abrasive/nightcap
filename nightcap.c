@@ -1,3 +1,6 @@
+// James Wah (abrasive) 2023
+// This file is in the public domain.
+
 // handle a delightful Windows/X11 type name conflict
 #define Status XStatus
 #include <X11/Xlib.h>
