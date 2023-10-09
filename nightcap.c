@@ -87,7 +87,7 @@ int main(int argc, char **argv) {
         return 0;
     }
 
-    char cmdline[32768];
+    char cmdline[MAX_PATH];
 
     STARTUPINFOA si;
     PROCESS_INFORMATION pi;
