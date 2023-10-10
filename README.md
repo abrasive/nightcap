@@ -1,5 +1,7 @@
 Nightcap lets you run old Windows screensavers under XScreenSaver, using wine.
 
+![xscreensaver-demo showing Windows' 3D Maze screensaver running](.screenshot.png)
+
 This uses the preview mode of the screensaver - where it draws into that little monitor in Windows' display settings.
 Screensavers that behave differently in preview mode probably won't work very well.
 
